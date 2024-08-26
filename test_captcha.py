@@ -19,11 +19,15 @@ if __name__ == "__main__":
         model = RotNetR(cls_num=cls_num, train=False)
         model_path = WhereIsMyModel(model).with_index(opts.index).model_dir / "best.pth"
         print(f"Use model: {model_path}")
-        model.load_state_dict(torch.load(str(model_path)))
+        model.load_state_dict(torch.load(str(model_path), map_location='cpu'))
         model = model.to(device=device)
         model.eval()
 
-        img = Image.open("datasets/tieba/1615096444.jpg")
+        # img = Image.open("datasets/tieba/1615096444.jpg")
+        # path = '/Users/liuqiang/WorkSpace/Python/fridamodels-scripts/kws/v10_7_20/captcha/rotating/'
+        path = '/Users/liuqiang/Downloads/rotating/'
+        img = Image.open(
+            path + "3b22ba78f0e886afbf9ea51b2b3f99b9_rotating_pic.jpeg")
         img_ts = process_captcha(img)
         img_ts = img_ts.to(device=device)
 
