@@ -20,7 +20,8 @@ if __name__ == '__main__':
     opts = parser.parse_args()
 
     with torch.no_grad():
-        dataset_root = Path("./datasets/captcha")
+        # dataset_root = Path("./datasets/captcha")
+        dataset_root = Path("/Users/liuqiang/Downloads/rotating/")
 
         img_paths = SequenceRoot(list(glob_imgs(dataset_root)))
         cls_num = DEFAULT_CLS_NUM
@@ -30,13 +31,13 @@ if __name__ == '__main__':
             test_dataset,
             batch_size=128,
             num_workers=default_num_workers(),
-            drop_last=True,
+            drop_last=False,
         )
 
         model = RCCNet_v0_5(train=False)
         model_path = WhereIsMyModel(model).with_index(opts.index).model_dir / "best.pth"
         print(f"Use model: {model_path}")
-        model.load_state_dict(torch.load(str(model_path)))
+        model.load_state_dict(torch.load(str(model_path), map_location='cpu'))
         model.to(device=device)
         model.eval()
 
@@ -54,4 +55,4 @@ if __name__ == '__main__':
 
             batch_count += 1
 
-        print(f"test_loss: {total_degree_diff/batch_count:.4f} degrees")
+        print(f"test_loss: {total_degree_diff / batch_count:.4f} degrees")

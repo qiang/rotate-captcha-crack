@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from rotate_captcha_crack.dataset.pipeline import SequenceRoot
 
 import torch
 from torch.nn import CrossEntropyLoss
@@ -25,9 +26,13 @@ if __name__ == "__main__":
 
     #################################
     ### Custom configuration area ###
-    dataset_root = Path("D:/Dataset/Streetview/data/data")
+    # dataset_root = Path("D:/Dataset/Streetview/data/data")
+    dataset_root = Path("/Users/liuqiang/Downloads/rotating/")
 
-    img_paths = google_street_view.get_paths(dataset_root)
+    # img_paths = google_street_view.get_paths(dataset_root)
+
+    img_paths = SequenceRoot(list(dataset_root.glob('*.jpeg')))
+
     cls_num = DEFAULT_CLS_NUM
     labelling = CircularSmoothLabel(cls_num)
 
@@ -41,14 +46,16 @@ if __name__ == "__main__":
         train_dataset,
         batch_size=64,
         num_workers=num_workers,
-        shuffle=True,
-        drop_last=True,
+
+        # shuffle=False,
+        drop_last=False,
     )
     val_dataloader = DataLoader(
         val_dataset,
         batch_size=64,
         num_workers=num_workers,
-        drop_last=True,
+
+        drop_last=False,
     )
 
     model = RotNetR(cls_num)

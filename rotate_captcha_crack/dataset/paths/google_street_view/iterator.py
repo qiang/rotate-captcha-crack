@@ -19,7 +19,7 @@ def get_paths(root: Path) -> SequenceRoot[Path]:
         Google StreetView Dataset: https://www.crcv.ucf.edu/data/GMCP_Geolocalization/
     """
 
-    iterator = glob_imgs(root, ('.jpg',))
+    iterator = glob_imgs(root, ('.jpeg',))
     iterator = IteratorRoot(iterator) | filter
     sequence = SequenceRoot(list(iterator))
     return sequence

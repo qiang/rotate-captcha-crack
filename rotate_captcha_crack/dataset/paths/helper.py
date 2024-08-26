@@ -2,7 +2,7 @@ from collections.abc import Iterable, Iterator
 from pathlib import Path
 
 
-def glob_imgs(root: Path, suffixes: Iterable[str] = ('.jpg', '.png')) -> Iterator[Path]:
+def glob_imgs(root: Path, suffixes: Iterable[str] = ('.jpg', '.png','jpeg')) -> Iterator[Path]:
     """
     Glob all image paths from one directory.
 
