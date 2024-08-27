@@ -218,8 +218,8 @@ def do_captcha():
                     # 获取home目录
                     home_dir = os.path.expanduser("~")
                     # 拼接路径
-                    bg_path = f'{home_dir}/Downloads/capthca/rest/zt/captcha/sliding/bgPic'
-                    cut_path = f'{home_dir}/Downloads/capthca/rest/zt/captcha/sliding/cutPic'
+                    bg_path = f'{home_dir}/WorkSpace/TencentPGC/capthca_api_mapping/rest/zt/captcha/sliding/bgPic'
+                    cut_path = f'{home_dir}/WorkSpace/TencentPGC/capthca_api_mapping/rest/zt/captcha/sliding/cutPic'
                     print("测试环境，加载测试环境代码")
                 else:
                     bg_path = download_image(captcha_url, f"./sliding/",
@@ -273,7 +273,7 @@ def do_captcha():
                         # 获取home目录
                         home_dir = os.path.expanduser("~")
                         # 拼接路径
-                        pic = f'{home_dir}/Downloads/capthca/rest/zt/captcha/rotating/pic'
+                        pic = f'{home_dir}/WorkSpace/TencentPGC/capthca_api_mapping/rest/zt/captcha/rotating/pic'
                         print("测试环境，加载测试环境代码-", pic)
 
                     else:
@@ -295,7 +295,7 @@ def do_captcha():
                     degree = predict * 360
                     # print(f"Predict degree: {degree:.4f}°")
                     # 转换成距离
-                    distance = predict * 720
+                    distance = int(predict * 720)
                     print('旋转：', predict, '角度：', degree, '转化成距离：', distance)
                 return jsonify({
                     'status': 0,
