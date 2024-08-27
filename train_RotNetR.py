@@ -27,7 +27,8 @@ if __name__ == "__main__":
     #################################
     ### Custom configuration area ###
     # dataset_root = Path("D:/Dataset/Streetview/data/data")
-    dataset_root = Path("/Users/liuqiang/Downloads/rotating/")
+    # dataset_root = Path("/Users/liuqiang/Downloads/rotating/")
+    dataset_root = Path('/home/tencent/deploy/code/rotating/')
 
     # img_paths = google_street_view.get_paths(dataset_root)
 

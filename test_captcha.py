@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import matplotlib.pyplot as plt
 import torch
@@ -21,14 +22,23 @@ if __name__ == "__main__":
         model_path = WhereIsMyModel(model).with_index(opts.index).model_dir / "best.pth"
         print(f"Use model: {model_path}")
         model.load_state_dict(torch.load(str(model_path), map_location='cpu'))
+        # model.load_state_dict(torch.load(str('/Users/liuqiang/Downloads/rotate-captcha-crack/models/RotNetR/240826_15_01_32_001/best.pth'), map_location='cpu'))
         model = model.to(device=device)
         model.eval()
 
         # img = Image.open("datasets/tieba/1615096444.jpg")
         # path = '/Users/liuqiang/WorkSpace/Python/fridamodels-scripts/kws/v10_7_20/captcha/rotating/'
         path = '/Users/liuqiang/Downloads/rotating/'
+        # path = '/home/tencent/deploy/code/rotating/'
         img = Image.open(
-            path + "17c551a9497a78bfe25b01cb03e5e466_rotating_pic.jpeg")
+            path + "a0e931b159b30fc3e7e76c960560b404_rotating_pic.jpeg")
+
+        home_dir = os.path.expanduser("~")
+        # 拼接路径
+        # pic = f'{home_dir}/Downloads/capthca/rest/zt/captcha/rotating/pic'
+        # print("测试环境，加载测试环境代码-", pic)
+        # img = Image.open(pic)
+
         img_ts = process_captcha(img)
         img_ts = img_ts.to(device=device)
 

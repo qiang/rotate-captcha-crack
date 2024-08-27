@@ -15,6 +15,7 @@
 !test_RotNetR.py
 !test_captcha.py
 !server.py
+!captcha_server.py
 
 !rotate_captcha_crack
 !rotate_captcha_crack/**
