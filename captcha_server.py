@@ -320,6 +320,49 @@ def do_captcha():
     }), 200
 
 
+def write_to_file(filepath, content):
+    # 获取目录路径
+    directory = os.path.dirname(filepath)
+
+    # 检查目录是否存在，如果不存在则创建
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # 写入文件
+    with open(filepath, 'a') as file:
+        file.write(content)
+
+
+@app.route('/seave_word', methods=['POST'])
+def seave_word():
+    if request.method == 'POST':
+        try:
+            data = request.json
+        except Exception as e:
+            data = None
+        if data:
+            seave_word_html = data.get('captcha_url')
+        else:
+            # 如果POST数据不是JSON格式，尝试获取表单数据
+            seave_word_html = request.form.get('captcha_url')
+        print('seave_word_html: ', seave_word_html)
+
+        md5 = hashlib.md5()
+        # 更新哈希对象 with the bytes of the input string
+        md5.update(seave_word_html.encode('utf-8'))
+        write_to_file(f'./word_content/{md5.hexdigest()}.txt', seave_word_html)
+
+        return jsonify({
+            'status': 0,
+            'errorMsg': 'ok',
+        }), 200
+
+    return jsonify({
+        'status': -1,
+        'errorMsg': 'error',
+    }), 200
+
+
 if __name__ == '__main__':
     #  adb reverse tcp:5005 tcp:5005
     app.run(debug=True, host='0.0.0.0', port=5005)
