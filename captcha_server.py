@@ -1,6 +1,7 @@
 #!/user/bin/env python
 # -*- coding: utf-8 -*-
 import hashlib
+import html
 import os
 import random
 import time
@@ -346,6 +347,18 @@ def seave_word():
             # 如果POST数据不是JSON格式，尝试获取表单数据
             seave_word_html = request.form.get('captcha_url')
         print('seave_word_html: ', seave_word_html)
+
+        try:
+            # 被转义的 HTML 代码字符串
+            # escaped_html = r"\u003Cdiv class=\"picker-verify-bar\"\u003E\u003Cdiv class=\"picker-text-tip\"\u003E\u003Cspan class=\"text\"\u003E请依次点击\u003C/span\u003E\u003Cul class=\"word-list\"\u003E\u003Cli class=\"word-item\"\u003E\n                “戳”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “棒”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “距”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “谈”\n            \u003C/li\u003E\u003C/ul\u003E\u003C/div\u003E\u003C!----\u003E\u003C!----\u003E\u003C!----\u003E\u003C/div\u003E"
+
+            # 使用 `html.unescape` 将转义的 HTML 转换为正常格式
+            seave_word_html = html.unescape(seave_word_html)
+
+            # 输出转换后的 HTML
+            print(seave_word_html)
+        except BaseException as e:
+            print(e)
 
         md5 = hashlib.md5()
         # 更新哈希对象 with the bytes of the input string
