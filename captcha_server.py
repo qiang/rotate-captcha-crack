@@ -315,8 +315,9 @@ def do_captcha():
             elif 'wordClick/pic' in captcha_url:
                 if ext:
                     p = parse_word_html(ext)
+                    words = "".join(p).replace(" ", "").replace("\n", "")
                     pic = download_image(captcha_url, f"./wordClick/",
-                                         f'{captcha_sn_md5}_{"".join(p)}_word_pic.jpeg')
+                                         f'{captcha_sn_md5}_{words}_word_pic.jpeg')
                 else:
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_word_pic.jpeg')
@@ -343,7 +344,7 @@ def write_to_file(filepath, content):
         os.makedirs(directory)
 
     # 写入文件
-    with open(filepath, 'a') as file:
+    with open(filepath, 'w') as file:
         file.write(content)
 
 
@@ -393,9 +394,9 @@ def parse_word_html(seave_word_html):
         # 使用 BeautifulSoup 解析 HTML 内容
         soup = BeautifulSoup(seave_word_html, 'lxml')
         # 提取提示文字
-        tip_text = soup.find('span', class_='text').text
+        tip_text = soup.find('span', class_='text').text.strip()
         # 提取所有单词项
-        word_items = [li.text.strip().replace("”", '').replace("“", '') for li in
+        word_items = [li.text.strip().replace("”", '').replace("“", '').strip() for li in
                       soup.find_all('li', class_='word-item')]
         print(f"提示文字: {tip_text}")
         print(f"单词列表: {word_items}")
