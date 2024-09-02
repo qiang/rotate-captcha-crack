@@ -1,9 +1,12 @@
 #!/user/bin/env python
 # -*- coding: utf-8 -*-
+import base64
+import binascii
 import hashlib
 import html
 import os
 import random
+import re
 import time
 import traceback
 from pathlib import Path
@@ -11,6 +14,7 @@ from pathlib import Path
 import cv2
 import requests
 from urllib.parse import urlparse, parse_qs
+from bs4 import BeautifulSoup
 
 import matplotlib.pyplot as plt
 import torch
@@ -195,9 +199,11 @@ def do_captcha():
 
     print('调用 do_captcha ')
     captcha_url = ''
+    ext = ''
     if request.method == 'GET':
         # 处理 GET 请求
         captcha_url = request.args.get('captcha_url', default='', type=str)
+        ext = request.args.get('ext', default='', type=str)
     elif request.method == 'POST':
         try:
             data = request.json
@@ -205,9 +211,11 @@ def do_captcha():
             data = None
         if data:
             captcha_url = data.get('captcha_url')
+            ext = data.get('ext')
         else:
             # 如果POST数据不是JSON格式，尝试获取表单数据
             captcha_url = request.form.get('captcha_url')
+            ext = request.form.get('ext')
 
     time_str = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     error = ''
@@ -305,9 +313,14 @@ def do_captcha():
                     'type': 'rotating',
                 }), 200
             elif 'wordClick/pic' in captcha_url:
-                pic = download_image(captcha_url, f"./wordClick/",
-                                     f'{captcha_sn_md5}_word_pic.jpeg')
-                pass
+                if ext:
+                    p = parse_word_html(ext)
+                    pic = download_image(captcha_url, f"./wordClick/",
+                                         f'{captcha_sn_md5}_{"".join(p)}_word_pic.jpeg')
+                else:
+                    pic = download_image(captcha_url, f"./wordClick/",
+                                         f'{captcha_sn_md5}_word_pic.jpeg')
+                # 请求其他服务来解决这个计算问题，目前项目我没有合并成功
         except KeyError as ke:
             error = 'KeyError-->' + str(ke)
             traceback.print_exc()
@@ -334,6 +347,65 @@ def write_to_file(filepath, content):
         file.write(content)
 
 
+def is_base64_encoded(data):
+    """
+    判断一个字符串是否是 Base64 编码的。
+
+    :param data: 要检查的字符串
+    :return: 如果字符串是有效的 Base64 编码，则返回 True，否则返回 False
+    """
+    # 检查字符串长度是否是4的倍数
+    if len(data) % 4 != 0:
+        return data
+
+    # Base64 编码的字符串只应该包含 A-Z, a-z, 0-9, +, / 和 =
+    base64_pattern = re.compile(r'^[A-Za-z0-9+/=]*$')
+    if not base64_pattern.match(data):
+        return data
+
+    try:
+        # 尝试解码 Base64 字符串
+        decoded_data = base64.b64decode(data, validate=True)
+        # 如果解码成功且没有异常，那么它是一个有效的 Base64 编码字符串
+        return decoded_data.decode()
+    except (binascii.Error, ValueError):
+        # 如果解码失败，则不是有效的 Base64 编码字符串
+        return data
+
+
+def parse_word_html(seave_word_html):
+    try:
+        # 被转义的 HTML 代码字符串
+        # escaped_html = r"\u003Cdiv class=\"picker-verify-bar\"\u003E\u003Cdiv class=\"picker-text-tip\"\u003E\u003Cspan class=\"text\"\u003E请依次点击\u003C/span\u003E\u003Cul class=\"word-list\"\u003E\u003Cli class=\"word-item\"\u003E\n                “戳”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “棒”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “距”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “谈”\n            \u003C/li\u003E\u003C/ul\u003E\u003C/div\u003E\u003C!----\u003E\u003C!----\u003E\u003C!----\u003E\u003C/div\u003E"
+
+        seave_word_html = is_base64_encoded(seave_word_html)
+        # 使用html.unescape将转义字符转换为正常的HTML标签
+        formatted_html = html.unescape(seave_word_html.strip())
+
+        # 输出格式化后的HTML
+        print('formatted_html===>', formatted_html)
+
+        md5 = hashlib.md5()
+        # 更新哈希对象 with the bytes of the input string
+        md5.update(formatted_html.encode('utf-8'))
+        write_to_file(f'./word_content/{md5.hexdigest()}.txt', formatted_html)
+
+        # 使用 BeautifulSoup 解析 HTML 内容
+        soup = BeautifulSoup(seave_word_html, 'lxml')
+        # 提取提示文字
+        tip_text = soup.find('span', class_='text').text
+        # 提取所有单词项
+        word_items = [li.text.strip().replace("”", '').replace("“", '') for li in
+                      soup.find_all('li', class_='word-item')]
+        print(f"提示文字: {tip_text}")
+        print(f"单词列表: {word_items}")
+
+        return word_items
+    except BaseException as e:
+        print(e)
+        return None
+
+
 @app.route('/seave_word', methods=['POST'])
 def seave_word():
     if request.method == 'POST':
@@ -348,28 +420,13 @@ def seave_word():
             seave_word_html = request.form.get('captcha_url')
         print('seave_word_html: ', seave_word_html)
 
-        try:
-            # 被转义的 HTML 代码字符串
-            # escaped_html = r"\u003Cdiv class=\"picker-verify-bar\"\u003E\u003Cdiv class=\"picker-text-tip\"\u003E\u003Cspan class=\"text\"\u003E请依次点击\u003C/span\u003E\u003Cul class=\"word-list\"\u003E\u003Cli class=\"word-item\"\u003E\n                “戳”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “棒”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “距”\n            \u003C/li\u003E\u003Cli class=\"word-item\"\u003E\n                “谈”\n            \u003C/li\u003E\u003C/ul\u003E\u003C/div\u003E\u003C!----\u003E\u003C!----\u003E\u003C!----\u003E\u003C/div\u003E"
-
-            # 使用 `html.unescape` 将转义的 HTML 转换为正常格式
-            seave_word_html = html.unescape(seave_word_html)
-
-            # 输出转换后的 HTML
-            print(seave_word_html)
-        except BaseException as e:
-            print(e)
-
-        md5 = hashlib.md5()
-        # 更新哈希对象 with the bytes of the input string
-        md5.update(seave_word_html.encode('utf-8'))
-        write_to_file(f'./word_content/{md5.hexdigest()}.txt', seave_word_html)
-
-        return jsonify({
-            'status': 0,
-            'errorMsg': 'ok',
-        }), 200
-
+        p = parse_word_html(seave_word_html)
+        if p:
+            return jsonify({
+                'status': 0,
+                'errorMsg': 'ok',
+                'result': ''.join(p),
+            }), 200
     return jsonify({
         'status': -1,
         'errorMsg': 'error',
