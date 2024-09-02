@@ -28,11 +28,17 @@ if __name__ == "__main__":
     ### Custom configuration area ###
     # dataset_root = Path("D:/Dataset/Streetview/data/data")
     # dataset_root = Path("/Users/liuqiang/Downloads/rotating/")
-    dataset_root = Path('/home/tencent/deploy/code/rotating/')
+    # dataset_root = Path("/Users/liuqiang/Downloads/rrrrrr/")
+    dataset_root = Path("/Users/liuqiang/Downloads/rotating_added/")
+    # dataset_root = Path('/home/tencent/deploy/code/rotating/')
 
     # img_paths = google_street_view.get_paths(dataset_root)
 
-    img_paths = SequenceRoot(list(dataset_root.glob('*.jpeg')))
+    png_files = list(dataset_root.glob('*.png'))
+    jpg_files = list(dataset_root.glob('*.jpeg'))
+    img_list = list(png_files + jpg_files)
+
+    img_paths = SequenceRoot(img_list)
 
     cls_num = DEFAULT_CLS_NUM
     labelling = CircularSmoothLabel(cls_num)
@@ -64,8 +70,8 @@ if __name__ == "__main__":
 
     lr = 0.01
     momentum = 0.9
-    epochs = 64
-    steps = 128
+    epochs = 300
+    steps = 6
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer, max_lr=lr, pct_start=0.25, epochs=epochs, steps_per_epoch=steps

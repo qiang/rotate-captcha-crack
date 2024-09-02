@@ -21,8 +21,9 @@ if __name__ == "__main__":
         # model = RCCNet_v0_5(train=False)
         model_path = WhereIsMyModel(model).with_index(opts.index).model_dir / "best.pth"
         print(f"Use model: {model_path}")
-        model.load_state_dict(torch.load(str(model_path), map_location='cpu'))
-        # model.load_state_dict(torch.load(str('/Users/liuqiang/Downloads/rotate-captcha-crack/models/RotNetR/240826_15_01_32_001/best.pth'), map_location='cpu'))
+        # model.load_state_dict(torch.load(str(model_path), map_location='cpu'))
+        model.load_state_dict(torch.load(str('/Users/liuqiang/Downloads/rotate-captcha-crack/models/RotNetR/240829_17_48_50_001/best.pth'), map_location='cpu'))
+        # model.load_state_dict(torch.load(str('/Users/liuqiang/Downloads/rotate-captcha-crack/models/RotNetR/240829_11_33_41_001/best.pth'), map_location='cpu'))
         model = model.to(device=device)
         model.eval()
 
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         path = '/Users/liuqiang/Downloads/rotating/'
         # path = '/home/tencent/deploy/code/rotating/'
         img = Image.open(
-            path + "a0e931b159b30fc3e7e76c960560b404_rotating_pic.jpeg")
+            path + "9968acf7e6e556be630ca6f45522ecdb_rotating_pic.jpeg")
 
         home_dir = os.path.expanduser("~")
         # 拼接路径
