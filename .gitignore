@@ -16,6 +16,7 @@
 !test_captcha.py
 !server.py
 !captcha_server.py
+!batch_rotaing.py
 
 !rotate_captcha_crack
 !requirements.txt
