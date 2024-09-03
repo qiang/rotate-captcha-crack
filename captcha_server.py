@@ -316,8 +316,10 @@ def do_captcha():
                 if ext:
                     p = parse_word_html(ext)
                     words = "".join(p).replace(" ", "").replace("\n", "")
+                    print("parse_word_html___words>>>", words)
+                    write_to_file(f"./wordClickText/{captcha_sn_md5}.txt", words)
                     pic = download_image(captcha_url, f"./wordClick/",
-                                         f'{captcha_sn_md5}_{words}_word_pic.jpeg')
+                                         f'{captcha_sn_md5}_{words}_word_pic.jpeg'.replace(" ", "").replace("\n", ""))
                 else:
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_word_pic.jpeg')
@@ -396,7 +398,7 @@ def parse_word_html(seave_word_html):
         # 提取提示文字
         tip_text = soup.find('span', class_='text').text.strip()
         # 提取所有单词项
-        word_items = [li.text.strip().replace("”", '').replace("“", '').strip() for li in
+        word_items = [li.text.strip().replace("”", '').replace("“", '').replace('\\n', '').strip() for li in
                       soup.find_all('li', class_='word-item')]
         print(f"提示文字: {tip_text}")
         print(f"单词列表: {word_items}")
