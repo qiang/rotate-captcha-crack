@@ -17,6 +17,9 @@
 !server.py
 !captcha_server.py
 !batch_rotaing.py
+!yolov5/
+!yolov5/**
+!yolov5/word_pick_check.py
 
 !rotate_captcha_crack
 !requirements.txt

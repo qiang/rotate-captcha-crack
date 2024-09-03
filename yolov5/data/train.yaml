@@ -1,0 +1,8 @@
+path: /Users/liuqiang/Downloads/yolov5/dataset  # 你dataset的绝对路径
+train: images/train           # 训练集的相对路径
+val: images/val               # 验证集的相对路径
+test:
+
+# Classes（标签类型，我们打标签的时候，标注的text）
+names:
+  0: text
