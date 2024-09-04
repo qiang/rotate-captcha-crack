@@ -209,9 +209,13 @@ def crop_rectangle(image_path, left_top, right_bottom, output_path):
         return None
 
 
-def do_check(img_path, word_list):
-    model = torch.hub.load('.', 'custom', path='runs/train/exp3/weights/best.pt',
-                           source='local')
+def do_check(img_path, word_list, model_path=None):
+    if model_path:
+        model = torch.hub.load('./yolov5', 'custom', path=model_path,
+                               source='local')
+    else:
+        model = torch.hub.load('.', 'custom', path='runs/train/exp3/weights/best.pt',
+                               source='local')
     # model = torch.hub.load('ultralytics/yolov5', 'custom', 'runs/train/exp3/weights/best.onnx')
 
     # 读取图片

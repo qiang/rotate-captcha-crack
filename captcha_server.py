@@ -27,6 +27,8 @@ from rotate_captcha_crack.utils import process_captcha
 
 from flask import Flask, request, jsonify
 
+from yolov5.word_pick_check import do_check
+
 app = Flask(__name__)
 
 test_captcha_sn = 'Cgp6dC5jYXB0Y2hhEtsCT6K2JR-TLgq0qjnr-HSWotdl3xhqU55LI-lgttr0ohzWOva0LrEbLGfbyQIiO3vCk85LhQlhHt6yjDLXBAP78X2s4gIjobBeBDwmwGslO7m3EEB9HCM2GlOUgZMni-GZBRK6up4piHRaYfZCFD8RahMlIyQPC9JyHTMICfB3LeozGAmAeRm5H_XBlnK5Fwv0F0pb_zpjjQSDDahpf62swde2APCsW2PkpHTbQ0hhzsq7w0BvChH0i3bjcs3jWWCae3OT-Cfl3GiVy8zL0ME1W_KzIicZ2-9wRON11qhhnIHXeOaZV-fGJwySHJMewyo2rQL5mutCIxD1wGtyfd6vQKvL7v4DmZkq9Ws18LljeavHxe3kO9t4sLUf3T9-nW2yxPGxjfbZzQYgwMjDuwwI2ctolMgAkTj9Nzdg49Cp9HZ4scE3K9TEf27arfwoQ3ypR9vcNY5jZXjJ9DgaEleIHYY8IfeWArTHzyF818xZgigFMAI'
@@ -320,10 +322,15 @@ def do_captcha():
                     write_to_file(f"./wordClickText/{captcha_sn_md5}.txt", words)
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_{words}_word_pic.jpeg'.replace(" ", "").replace("\n", ""))
+                    do_check('yolov5/dataset/images/val/1a853b93359b27a8228bded9f2231fb3_word_pic.jpeg',
+                             ['潭', '稚', '炼', '感'], model_path='yolov5/runs/train/exp3/weights/best.pt')
+                    # do_check(pic, list(words), model_path='yolov5/runs/train/exp3/weights/best.pt')
+                    # 请求其他服务来解决这个计算问题，目前项目我没有合并成功
                 else:
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_word_pic.jpeg')
-                # 请求其他服务来解决这个计算问题，目前项目我没有合并成功
+                    print("处理文字验证码错误")
+
         except KeyError as ke:
             error = 'KeyError-->' + str(ke)
             traceback.print_exc()
