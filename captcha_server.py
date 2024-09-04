@@ -322,10 +322,18 @@ def do_captcha():
                     write_to_file(f"./wordClickText/{captcha_sn_md5}.txt", words)
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_{words}_word_pic.jpeg'.replace(" ", "").replace("\n", ""))
-                    do_check('yolov5/dataset/images/val/1a853b93359b27a8228bded9f2231fb3_word_pic.jpeg',
-                             ['潭', '稚', '炼', '感'], model_path='yolov5/runs/train/exp3/weights/best.pt')
-                    # do_check(pic, list(words), model_path='yolov5/runs/train/exp3/weights/best.pt')
-                    # 请求其他服务来解决这个计算问题，目前项目我没有合并成功
+                    if test_captcha_sn in captcha_url:
+                        # 测试环境而已
+                        r = do_check('yolov5/dataset/images/val/1a853b93359b27a8228bded9f2231fb3_word_pic.jpeg',
+                                     ['潭', '稚', '炼', '感'], model_path='yolov5/runs/train/exp3/weights/best.pt')
+                    else:
+                        r = do_check(pic, list(words), model_path='yolov5/runs/train/exp3/weights/best.pt')
+                    return jsonify({
+                        'status': 0,
+                        'errorMsg': 'success',
+                        'data': r,
+                        'wordList': list(words),
+                    }), 200
                 else:
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_word_pic.jpeg')
