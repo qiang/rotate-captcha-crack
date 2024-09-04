@@ -317,15 +317,18 @@ def do_captcha():
             elif 'wordClick/pic' in captcha_url:
                 if ext:
                     p = parse_word_html(ext)
+                    if p is None:
+                        p = ''
                     words = "".join(p).replace(" ", "").replace("\n", "")
                     print("parse_word_html___words>>>", words)
                     write_to_file(f"./wordClickText/{captcha_sn_md5}.txt", words)
                     pic = download_image(captcha_url, f"./wordClick/",
                                          f'{captcha_sn_md5}_{words}_word_pic.jpeg'.replace(" ", "").replace("\n", ""))
                     if test_captcha_sn in captcha_url:
+                        words = '潭稚炼感'
                         # 测试环境而已
                         r = do_check('yolov5/dataset/images/val/1a853b93359b27a8228bded9f2231fb3_word_pic.jpeg',
-                                     ['潭', '稚', '炼', '感'], model_path='yolov5/runs/train/exp3/weights/best.pt')
+                                     list(words), model_path='yolov5/runs/train/exp3/weights/best.pt')
                     else:
                         r = do_check(pic, list(words), model_path='yolov5/runs/train/exp3/weights/best.pt')
                     return jsonify({
