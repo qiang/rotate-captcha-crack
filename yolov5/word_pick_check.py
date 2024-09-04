@@ -20,6 +20,9 @@ def draw_on_image(image_path, word_list, word_boxes, saved_name, is_show=False):
     :param word_boxes: 上面计算出来的文字中心点
     :return: None
     """
+
+    print("draw_on_image==>", word_list, word_boxes, saved_name)
+
     # 每项为 (中心点坐标, 半径, 标注文字)
     circles_with_labels = [
         # ((100, 100), 50, '1'),
@@ -278,7 +281,18 @@ def do_check(img_path, word_list, model_path=None):
     # results.save()
     print(json.dumps(word_boxes, ensure_ascii=False, ))
 
-    draw_on_image(img_path, word_list, word_boxes, f'./recognized_img_cache/{Path(img_path).stem}.png')
+    try:
+        draw_on_image(img_path, word_list, word_boxes, f'./recognized_img_cache/{Path(img_path).stem}.png')
+    except BaseException as e:
+        error_path = f'./recognized_img_cache_error/{Path(img_path).stem}.png'
+        directory = os.path.dirname(error_path)
+        # 如果目录不存在则创建
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        original_img = Image.open(img_path)
+        # 创建图片副本进行绘制
+        img_copy = original_img.copy()
+        img_copy.save(error_path)
 
     return word_boxes
 
