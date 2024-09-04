@@ -67,6 +67,7 @@ def draw_on_image(image_path, word_list, word_boxes, saved_name, is_show=False):
                     font = ImageFont.truetype("/Library/Fonts/PingFang.ttc", 20)  # 确保路径和字体文件存在
                     print("当前操作系统是 macOS")
             except IOError:
+                print("出现异常，使用默认字体。。。。")
                 font = ImageFont.load_default()
             # 计算文本的边界框
             text_bbox = draw.textbbox((0, 0), text, font=font)
@@ -88,8 +89,16 @@ def draw_on_image(image_path, word_list, word_boxes, saved_name, is_show=False):
         # 加载系统默认字体
         try:
             font_size = 60
-            # 尝试加载 Mac 系统自带的字体
-            font = ImageFont.truetype("/Library/Fonts/Arial.ttf", font_size)  # 确保路径和字体文件存在
+            import platform
+            # 获取系统类型
+            system = platform.system()
+            if system == "Linux":
+                print("当前操作系统是  Linux 绘制数字")
+                font = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+                                          60)  # 确保路径和字体文件存在
+            else:
+                font = ImageFont.truetype("/Library/Fonts/Arial.ttf", font_size)  # 确保路径和字体文件存在
+                print("当前操作系统是 macOS 绘制数字")
         except IOError:
             # 如果指定字体文件无法找到，则使用默认字体
             font = ImageFont.load_default()
